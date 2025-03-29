@@ -2,41 +2,14 @@
 http://localhost:8761/naming-server/
 
 # Currency conversion service
-http://localhost:8100/currency-conversion-service/conversion-feign/from/EUR/to/INR/quantity/20
+http://localhost:8101/currency-conversion/conversion-feign/from/EUR/to/INR/quantity/20
 
 # Currency exchange service
-http://localhost:8001/currency-exchange-service/exchange/from/USD/to/INR
+http://localhost:8001/currency-exchange/exchange/from/USD/to/INR
 
 # API Gateway
 http://localhost:8765/
 
 
-Initial
-
-- http://localhost:8765/currency-exchange-service/currency-exchange-service/exchange/from/USD/to/INR
-
-- http://localhost:8765/currency-conversion-service/currency-conversion-service/conversion-feign/from/EUR/to/INR/quantity/20
-
-- http://localhost:8765/currency-conversion-service/currency-conversion-service/conversion-feign/from/EUR/to/INR/quantity/20
-
-
-
-Lower Case
-
-- http://localhost:8765/currency-exchange/currency-exchange/from/USD/to/INR
-
-- http://localhost:8765/currency-conversion/currency-conversion/from/USD/to/INR/quantity/10
-
-- http://localhost:8765/currency-conversion/currency-conversion-feign/from/USD/to/INR/quantity/10
-
-
-
-Custom Routes
-
-- http://localhost:8765/currency-exchange/from/USD/to/INR
-
-- http://localhost:8765/currency-conversion/from/USD/to/INR/quantity/10
-
-- http://localhost:8765/currency-conversion-feign/from/USD/to/INR/quantity/10
-
-- http://localhost:8765/currency-conversion-new/from/USD/to/INR/quantity/10
+# Config server
+http://localhost:8766/

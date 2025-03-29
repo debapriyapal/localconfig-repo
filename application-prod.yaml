@@ -1,0 +1,15 @@
+jwt:
+  secret:
+    key: Yn2kjibddFAWtnPJ2AFlL8WXmohJMCvigQggaEypa5E=
+  access:
+    token:
+      expiration: 60000
+  refresh: 
+    token:
+      expiration: 3600000
+
+spring:
+  data:
+    redis:
+      host: localhost
+      port: 6379

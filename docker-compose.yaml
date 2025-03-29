@@ -1,61 +1,96 @@
-version: '1.1'
-
 services:
+  redis:
+    image: redis:latest
+    container_name: redis
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - tutorial-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+
   naming-server:
-    image: debapriyapal/naming-server:0.0.1-SNAPSHOT
+    image: debapriyapal/naming-server:0.0.1
     mem_limit: 700m
+    container_name: naming-server
     ports:
       - "8761:8761"
     networks:
-      - currency-network
+      - tutorial-network
       
-  currency-exchange-service:
-    image: debapriyapal/currency-exchange-service:0.0.1-SNAPSHOT
+  #currency-exchange-service:
+  #  image: debapriyapal/currency-exchange-service:0.0.1-SNAPSHOT
+  #  mem_limit: 700m
+  #  ports:
+  #    - "8001:8001"
+  #  networks:
+  #    - currency-network
+  #  depends_on:
+  #    - naming-server
+  #  environment:
+  #    EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://naming-server:8761/naming-server/eureka
+  #    MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://zipkin-server:9411/api/v2/spans
+      
+  #currency-conversion-service:
+  #  image: debapriyapal/currency-conversion-service:0.0.1-SNAPSHOT
+  #  mem_limit: 700m
+  #  ports:
+  #    - "8101:8101"
+  #  networks:
+  #    - currency-network
+  #  depends_on:
+  #    - naming-server
+  #  environment:
+  #    EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://naming-server:8761/naming-server/eureka
+  #    MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://zipkin-server:9411/api/v2/spans
+  
+  user-service:
+    image: debapriyapal/user-service:0.0.1
+    container_name: user-service
     mem_limit: 700m
     ports:
-      - "8001:8001"
+      - "8100:8100"
     networks:
-      - currency-network
+      - tutorial-network
     depends_on:
-      - naming-server
+      naming-server:
+        condition: service_started
+      redis:
+        condition: service_healthy
     environment:
       EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://naming-server:8761/naming-server/eureka
       MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://zipkin-server:9411/api/v2/spans
-      
-  currency-conversion-service:
-    image: debapriyapal/currency-conversion-service:0.0.1-SNAPSHOT
-    mem_limit: 700m
-    ports:
-      - "8101:8101"
-    networks:
-      - currency-network
-    depends_on:
-      - naming-server
-    environment:
-      EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://naming-server:8761/naming-server/eureka
-      MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://zipkin-server:9411/api/v2/spans
+      spring.data.redis.host: redis
+      spring.data.redis.port: 6379
   
   api-gateway:
-    image: debapriyapal/api-gateway:0.0.1-SNAPSHOT
+    image: debapriyapal/api-gateway:0.0.1
+    container_name: api-gateway
     mem_limit: 700m
     ports:
       - "8765:8765"
     networks:
-      - currency-network
+      - tutorial-network
     depends_on:
-      - naming-server
+      naming-server:
+        condition: service_started
     environment:
       EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://naming-server:8761/naming-server/eureka
       MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://zipkin-server:9411/api/v2/spans
       
   zipkin-server:
     image: openzipkin/zipkin:latest
+    container_name: zipkin-server
     mem_limit: 300m
     ports:
       - "9411:9411"
     networks:
-      - currency-network
+      - tutorial-network
     restart: always #Restart if there is a problem starting up
       
 networks:
-  currency-network:
+  tutorial-network:
