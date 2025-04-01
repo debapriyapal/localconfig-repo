@@ -15,8 +15,6 @@ spring:
     redis:
       host: localhost
       port: 6379
-  config:
-    import: optional:configserver:http://localhost:8766
       
 eureka:
   client:
