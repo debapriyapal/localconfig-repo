@@ -13,6 +13,16 @@ services:
       timeout: 3s
       retries: 3
       
+  mysql:
+    image: mysql:latest
+    container_name: mysql
+    restart: always
+    ports:
+      - "3306:3306"
+      - "33060:33060"
+    networks:
+      - tutorial-network
+      
   config-server:
     image: debapriyapal/config-server:0.0.1
     mem_limit: 200m
@@ -40,6 +50,8 @@ services:
     networks:
       - tutorial-network
     depends_on:
+      config-server:
+        condition: service_started
       naming-server:
         condition: service_started
     environment:
@@ -81,6 +93,31 @@ services:
     networks:
       - tutorial-network
     depends_on:
+      config-server:
+        condition: service_started
+      naming-server:
+        condition: service_started
+      redis:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+    environment:
+      EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://naming-server:8761/naming-server/eureka
+      MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://zipkin-server:9411/api/v2/spans
+      spring.data.redis.host: redis
+      spring.data.redis.port: 6379
+      
+  aaa-service:
+    image: debapriyapal/aaa-service:0.0.1
+    container_name: aaa-service
+    mem_limit: 700m
+    ports:
+      - "8200:8200"
+    networks:
+      - tutorial-network
+    depends_on:
+      config-server:
+        condition: service_started
       naming-server:
         condition: service_started
       redis:
@@ -90,9 +127,7 @@ services:
       MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://zipkin-server:9411/api/v2/spans
       spring.data.redis.host: redis
       spring.data.redis.port: 6379
-  
-  
-      
+
   zipkin-server:
     image: openzipkin/zipkin:latest
     container_name: zipkin-server
